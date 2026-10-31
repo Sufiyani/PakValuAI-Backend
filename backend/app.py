@@ -905,18 +905,25 @@ def internal_error(error):
     return jsonify({"error": "Internal server error"}), 500
 
 # ============================
-# START SERVER
+# LOAD MODELS ON STARTUP
+# (called for both gunicorn and direct python run)
+# ============================
+print("\n" + "=" * 60)
+print("🚀 FLASK BACKEND STARTING...")
+print("=" * 60)
+success = load_models()
+if not success:
+    print("⚠️ WARNING: Some models failed to load!")
+print("=" * 60 + "\n")
+
+# ============================
+# START SERVER (local dev only)
 # ============================
 if __name__ == "__main__":
-    print("\n" + "=" * 60)
-    print("🚀 FLASK BACKEND STARTING...")
-    print("=" * 60)
-    success = load_models()
-    if not success:
-        print("⚠️ WARNING: Some models failed to load!")
+    port = int(os.environ.get("PORT", 5000))
     print("\n📍 Server running at: http://localhost:5000")
     print("📖 API Documentation: http://localhost:5000")
     print("\n💡 Test with:")
     print("   curl http://localhost:5000/api/health")
     print("\n" + "=" * 60 + "\n")
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=False, host="0.0.0.0", port=port)
